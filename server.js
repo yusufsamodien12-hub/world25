@@ -58,6 +58,8 @@ app.post('/api/state', (req, res) => {
     
     try {
       const { systemInstruction, prompt, model = 'mistral-large-latest' } = req.body;
+      console.log(`[Mistral Proxy] API Request: model=${model}, promptLen=${prompt?.length}`);
+      
       const client = new Mistral({ apiKey: userApiKey });
 
       const messages = [
@@ -73,7 +75,15 @@ app.post('/api/state', (req, res) => {
       });
 
     const responseText = chatResponse.choices?.[0]?.message?.content || '{}';
+    console.log(`[Mistral Proxy] API Response received, length: ${responseText.length}`);
     
+    // Log the first 200 chars and last 200 chars for debugging
+    if (responseText.length > 400) {
+        console.log(`[Mistral Proxy] Snippet: ${responseText.substring(0, 200)}...${responseText.substring(responseText.length - 200)}`);
+    } else {
+        console.log(`[Mistral Proxy] Response: ${responseText}`);
+    }
+
     res.json({ 
       text: responseText,
       success: true 

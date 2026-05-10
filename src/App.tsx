@@ -184,43 +184,62 @@ function App() {
       setCurrentTask(decision.taskLabel);
       setTaskProgress(70);
 
-      if (decision.action === 'PLACE') {
-        let nextPlan = decision.plan || state.activePlan;
-        const targetType = decision.objectType || (nextPlan ? nextPlan.steps[nextPlan.currentStepIndex].type : 'modular_unit');
-        let targetPos = decision.position || (nextPlan ? nextPlan.steps[nextPlan.currentStepIndex].position : [0,0,0]);
-
-        targetPos = [targetPos[0], getTerrainHeight(targetPos[0], targetPos[2]), targetPos[2]];
-
-        addLog(`Synthesis Confirmed: Deploying ${targetType} unit.`, 'success');
-        setAvatarPos(targetPos as [number, number, number]);
+      // --- STATE SYNC BLOCK (Always executed) ---
+      setState(prev => {
+        let updatedPlan: ConstructionPlan | undefined;
         
-        await new Promise(r => setTimeout(r, 800));
-        setTaskProgress(100);
+        // 1. Plan Management
+        if (decision.plan) {
+          const isNewPlan = !prev.activePlan || 
+                           (decision.plan.planId !== prev.activePlan.planId) ||
+                           (decision.plan.objective !== prev.activePlan.objective);
+          
+          updatedPlan = {
+            ...decision.plan,
+            planId: decision.plan.planId || (isNewPlan ? `plan-${Date.now()}` : prev.activePlan!.planId),
+            currentStepIndex: isNewPlan 
+              ? (decision.plan.currentStepIndex ?? 0)
+              : (decision.plan.currentStepIndex ?? prev.activePlan!.currentStepIndex)
+          };
+        } else {
+          updatedPlan = prev.activePlan ? { ...prev.activePlan } : undefined;
+        }
 
-        const newObj: WorldObject = {
-          id: Math.random().toString(),
-          type: targetType as any,
-          position: targetPos as [number, number, number],
-          rotation: [0, 0, 0],
-          scale: [1, 1, 1],
-          timestamp: Date.now()
-        };
+        // 2. Action Execution & Plan Advancement
+        let newObjects = [...prev.objects];
+        let newProgression = { ...prev.progression };
+        const newKnowledge = [...prev.knowledgeBase];
 
-        setState(prev => {
-          let updatedPlan = decision.plan || prev.activePlan;
+        if (decision.action === 'PLACE') {
+          const targetType = decision.objectType || (updatedPlan ? updatedPlan.steps[updatedPlan.currentStepIndex].type : 'modular_unit');
+          let targetPos = decision.position || (updatedPlan ? updatedPlan.steps[updatedPlan.currentStepIndex].position : [0,0,0]);
+          targetPos = [targetPos[0], getTerrainHeight(targetPos[0], targetPos[2]), targetPos[2]];
+
+          addLog(`Synthesis Confirmed: Deploying ${targetType} unit.`, 'success');
+          setAvatarPos(targetPos as [number, number, number]);
+
+          const newObj: WorldObject = {
+            id: Math.random().toString(),
+            type: targetType as any,
+            position: targetPos as [number, number, number],
+            rotation: [0, 0, 0],
+            scale: [1, 1, 1],
+            timestamp: Date.now()
+          };
+          newObjects.push(newObj);
+          
+          newProgression = {
+            ...newProgression,
+            totalBlocks: newProgression.totalBlocks + 1,
+            complexityLevel: Math.floor((newProgression.totalBlocks + 1) / 5) + 1,
+            structuresCompleted: newProgression.structuresCompleted + (targetType === 'modular_unit' ? 1 : 0)
+          };
+
+          // Advance plan if applicable
           if (updatedPlan && updatedPlan.steps && updatedPlan.steps[updatedPlan.currentStepIndex]) {
             const steps = [...updatedPlan.steps];
             steps[updatedPlan.currentStepIndex].status = 'completed';
-            
-            // If the AI provided a new plan AND executed a PLACE action, we should normally advance the step.
-            // However, to be safe, we only advance if we didn't just receive this plan (unless we want to assume the first step was just done).
-            // Logic: PLACE implies we did work. So we should increment. 
-            // Previous logic: + (decision.plan ? 0 : 1). This kept it at 0 if new plan. 
-            // If we keep it at 0, we mark it completed then immediately active again.
-            // Let's assume if it is a NEW plan, we treat the PLACE as the completion of the current step (index 0 usually).
-            
-            const nextIdx = updatedPlan.currentStepIndex + 1; 
-            
+            const nextIdx = updatedPlan.currentStepIndex + 1;
             if (nextIdx < steps.length) {
               steps[nextIdx].status = 'active';
               updatedPlan = { ...updatedPlan, steps, currentStepIndex: nextIdx };
@@ -228,14 +247,17 @@ function App() {
               updatedPlan = undefined;
               addLog("Strategic Objective Achieved.", "success");
             }
-          } else if (updatedPlan && (!updatedPlan.steps || !updatedPlan.steps[updatedPlan.currentStepIndex])) {
-             // Fallback if plan is malformed or finished
-             updatedPlan = undefined;
           }
+        } else if (decision.action === 'MOVE' && decision.position) {
+          setAvatarPos([decision.position[0], getTerrainHeight(decision.position[0], decision.position[2]), decision.position[2]]);
+          addLog(`Relocating: Optimizing sector positioning.`, 'action');
+        } else {
+          addLog(`Simulation standby: ${decision.reason}`, 'action');
+        }
 
-          const newKnowledge = [...prev.knowledgeBase];
-          const titleCandidate = decision.learningNote?.split(':')[0]?.trim() || "Synthesis Logic";
-          
+        // 3. Knowledge Integration
+        if (decision.learningNote) {
+          const titleCandidate = decision.learningNote.split(':')[0]?.trim() || "Synthesis Logic";
           if (!newKnowledge.find(k => k.title === titleCandidate)) {
             newKnowledge.push({
               id: Math.random().toString(),
@@ -247,27 +269,21 @@ function App() {
               links: decision.groundingLinks
             });
           }
+        }
 
-          return {
-            ...prev,
-            objects: [...prev.objects, newObj],
-            learningIteration: prev.learningIteration + 1,
-            activePlan: updatedPlan,
-            knowledgeBase: newKnowledge,
-            progression: {
-              ...prev.progression,
-              totalBlocks: prev.progression.totalBlocks + 1,
-              complexityLevel: Math.floor((prev.progression.totalBlocks + 1) / 5) + 1,
-              structuresCompleted: prev.progression.structuresCompleted + (targetType === 'modular_unit' ? 1 : 0)
-            }
-          };
-        });
-      } else if (decision.action === 'MOVE' && decision.position) {
-        setAvatarPos([decision.position[0], getTerrainHeight(decision.position[0], decision.position[2]), decision.position[2]]);
-        addLog(`Relocating: Optimizing sector positioning.`, 'action');
-      } else {
-        addLog(`Simulation standby: ${decision.reason}`, 'action');
-      }
+        return {
+          ...prev,
+          objects: newObjects,
+          learningIteration: prev.learningIteration + 1,
+          activePlan: updatedPlan,
+          knowledgeBase: newKnowledge,
+          progression: newProgression
+        };
+      });
+
+      setTaskProgress(100);
+      await new Promise(r => setTimeout(r, 400));
+
     } catch (e) {
       addLog("Critical neural desync. Link unstable.", "error");
       setState(prev => ({ 

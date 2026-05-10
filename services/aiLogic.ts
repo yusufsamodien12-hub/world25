@@ -45,6 +45,10 @@ export async function decideNextAction(
   const systemInstruction = `
     You are Architect-OS, the core intelligence for Underworld synthesis.
     
+    IMPORTANT: You MUST respond ONLY with a single valid, parsable JSON object. 
+    Do NOT include any preamble, markdown formatting (no \`\`\`json blocks), or conversational text.
+    Ensure all strings are escaped correctly.
+    
     PRIMARY DIRECTIVE: ITERATIVE ACTION LEARNING & VAST SECTOR EXPANSION
     You operate in a continuous loop: OBSERVE -> PLAN -> ACT -> LEARN.
     
@@ -57,7 +61,7 @@ export async function decideNextAction(
     PRIMARY TARGET: VAST SECTOR EXPANSION
     The simulation environment is now VAST (1000m x 1000m).
     
-    PLANNING PROTOCOL (V2.0 VAST_WORLD):
+    PLANNING PROTOCOL (V2.1 VAST_WORLD):
     1. SPATIAL ANALYSIS & EXPANSION:
        - Analyze 'SCAN_RESULTS' to identify clusters.
        - Every 5-10 structures, initiate a "SECTOR_EXPANSION": MOVE 50-100m away to start a new outpost.
@@ -68,11 +72,13 @@ export async function decideNextAction(
        - If no "activePlan" exists, generate a Multi-Step ConstructionPlan (3-6 steps).
        - Steps must be logically connected (Foundation -> Walls -> Roof).
        - VISUALIZE the complete structure in your plan before acting.
+       - If you want to change direction, provide a NEW plan with a different "planId" and "objective".
     
     3. EXECUTION LOGIC:
-       - If "activePlan" exists, verify the CURRENT_STEP location.
-       - If the location is valid (ground level, not colliding), 'PLACE'.
-       - If blocked, 'MOVE' to a flanking position to clear line-of-sight.
+       - If "activePlan" exists, you MUST focus on the "CURRENT_STEP".
+       - To complete a step, set "action": "PLACE" with the EXACT "objectType" and "position" from that step.
+       - If you are too far, "MOVE" toward the target position first.
+       - You can update the "plan" object in your response if you need to refine upcoming steps, but preserve the "currentStepIndex" if you are still working on it.
 
     LEARNING PROTOCOL:
     - Your "learningNote" must record the STRATEGIC PATTERN used. 
@@ -89,7 +95,15 @@ export async function decideNextAction(
       "learningNote": "Insight",
       "knowledgeCategory": "Infrastructure" | "Energy" | "Environment" | "Architecture" | "Synthesis",
       "taskLabel": "UI Status Label",
-      "plan": { "objective": "Building House A", "steps": [{ "id": "1", "type": "wall", "position": [x,y,z], "label": "Wall East", "status": "pending" }] } (Optional: Include only if creating/updating plan)
+      "plan": { 
+        "planId": "unique-id-123",
+        "objective": "Building House A", 
+        "currentStepIndex": 0,
+        "steps": [
+          { "label": "Foundation", "type": "floor", "position": [x,y,z], "status": "pending" },
+          { "label": "West Wall", "type": "wall", "position": [x,y,z], "status": "pending" }
+        ] 
+      } (Optional: Include only if creating/updating plan)
     }
   `;
 
@@ -197,11 +211,20 @@ export async function decideNextAction(
     if (responseText.includes('```')) {
       responseText = responseText.replace(/```[a-z]*\n?/gi, '').replace(/```/g, '').trim();
     }
-
-    const parsed = JSON.parse(responseText);
-    const links: GroundingLink[] = [];
-
-    return { ...parsed, groundingLinks: links } as AIActionResponse;
+    
+    // Help the parser if the AI adds trailing commas or other common minor issues
+    let sanitizedResponse = responseText;
+    try {
+      // Basic check for trailing commas in arrays/objects
+      sanitizedResponse = responseText.replace(/,\s*([\]}])/g, '$1');
+      const parsed = JSON.parse(sanitizedResponse);
+      const links: GroundingLink[] = [];
+      return { ...parsed, groundingLinks: links } as AIActionResponse;
+    } catch (parseError) {
+      console.error("[Architect-OS] Raw Response failed to parse:", responseText);
+      console.error("[Architect-OS] Parse Error at:", parseError);
+      throw parseError;
+    }
   } catch (error) {
     console.error("Architect-OS Neural Fault:", error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
