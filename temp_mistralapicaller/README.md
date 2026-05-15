@@ -18,20 +18,20 @@ npx wrangler deploy
 
 ### 2. Get Your Worker URL
 
-After deployment, copy the URL (e.g., `https://mistralapicaller.yourusername.workers.dev`)
+After deployment, copy the URL (e.g., `https://nexus-backend.yourusername.workers.dev`)
 
 ### 3. Configure Frontend
 
 Update your `.env.local` file:
 ```bash
-VITE_PROXY_URL=https://mistralapicaller.yourusername.workers.dev/v1/chat/completions
+VITE_PROXY_URL=https://nexus-backend.yourusername.workers.dev/v1/chat/completions
 ```
 
 ### 4. Test It
 
 Open `test.html` in your browser or visit:
 ```
-https://mistralapicaller.yourusername.workers.dev/
+https://nexus-backend.yourusername.workers.dev/
 ```
 
 ## 📚 Full Documentation

@@ -8,7 +8,7 @@ Create/update `.env.local` in your project root:
 
 ```bash
 # Production: Use your deployed Worker URL
-VITE_PROXY_URL=https://mistralapicaller.yusufsamodin67.workers.dev/v1/chat/completions
+VITE_PROXY_URL=https://nexus-backend.yusufsamodin67.workers.dev/v1/chat/completions
 
 # Development: Optional - use direct API or local worker
 # VITE_MISTRAL_API_KEY=your_dev_key_here
@@ -98,7 +98,7 @@ Visit `http://localhost:5173` and open DevTools Console
 
 ### Direct Worker Test
 ```bash
-curl https://mistralapicaller.yusufsamodin67.workers.dev/
+curl https://nexus-backend.yusufsamodin67.workers.dev/
 ```
 
 ### Interactive Test Page

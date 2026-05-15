@@ -79,7 +79,7 @@ npx wrangler deploy
 
 After deployment, you'll see your Worker URL:
 ```
-https://mistralapicaller.YOUR_SUBDOMAIN.workers.dev
+https://nexus-backend.YOUR_SUBDOMAIN.workers.dev
 ```
 
 **Save this URL!** You'll need it for Step 5.
@@ -90,7 +90,7 @@ https://mistralapicaller.YOUR_SUBDOMAIN.workers.dev
 
 ### Test health check
 ```bash
-curl https://mistralapicaller.YOUR_SUBDOMAIN.workers.dev/
+curl https://nexus-backend.YOUR_SUBDOMAIN.workers.dev/
 ```
 
 Expected response:
@@ -114,7 +114,7 @@ Expected response:
 
 ### Test Mistral API proxy
 ```bash
-curl -X POST https://mistralapicaller.YOUR_SUBDOMAIN.workers.dev/v1/chat/completions \
+curl -X POST https://nexus-backend.YOUR_SUBDOMAIN.workers.dev/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
     "model": "mistral-large-latest",
@@ -132,14 +132,14 @@ curl -X POST https://mistralapicaller.YOUR_SUBDOMAIN.workers.dev/v1/chat/complet
 
 Create or update `.env.local` in the root of your project:
 ```bash
-VITE_PROXY_URL=https://mistralapicaller.YOUR_SUBDOMAIN.workers.dev/v1/chat/completions
+VITE_PROXY_URL=https://nexus-backend.YOUR_SUBDOMAIN.workers.dev/v1/chat/completions
 ```
 
 ### Option B: Direct Code Update
 
 Update [services/aiLogic.ts](../services/aiLogic.ts):
 ```typescript
-const proxyUrl = 'https://mistralapicaller.YOUR_SUBDOMAIN.workers.dev/v1/chat/completions';
+const proxyUrl = 'https://nexus-backend.YOUR_SUBDOMAIN.workers.dev/v1/chat/completions';
 ```
 
 ---
