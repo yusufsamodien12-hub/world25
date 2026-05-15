@@ -102,7 +102,7 @@ curl https://nexus-backend.yusufsamodin67.workers.dev/
 ```
 
 ### Interactive Test Page
-Open `temp_mistralapicaller/test.html` in a browser
+Open `temp_nexus-backend/test.html` in a browser
 
 ---
 
@@ -137,7 +137,7 @@ Open `temp_mistralapicaller/test.html` in a browser
            ↓
 ┌──────────────────────┐
 │ Cloudflare Worker    │
-│ temp_mistralapicaller│
+│ temp_nexus-backend│
 │ + MISTRAL_API_KEY    │
 │ + D1 Database        │
 └──────────┬───────────┘
@@ -184,7 +184,7 @@ curl -I https://YOUR_WORKER.workers.dev/
 ### Issue: Worker returns 500 error
 **Solution**: Check Worker logs:
 ```bash
-cd temp_mistralapicaller
+cd temp_nexus-backend
 npx wrangler tail
 ```
 
@@ -211,7 +211,7 @@ npx wrangler tail
 
 ## 🎯 Next Steps
 
-1. Deploy your Worker: `cd temp_mistralapicaller && npx wrangler deploy`
+1. Deploy your Worker: `cd temp_nexus-backend && npx wrangler deploy`
 2. Copy Worker URL
 3. Update `.env.local` with Worker URL
 4. Test locally: `npm run dev`

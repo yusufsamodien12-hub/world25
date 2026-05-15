@@ -1,7 +1,7 @@
 #!/bin/bash
-# Test script for world26 and mistralapicaller
+# Test script for world26 and nexus-backend
 
-echo "🧪 Testing world26 and mistralapicaller integration"
+echo "🧪 Testing world26 and nexus-backend integration"
 echo "=================================================="
 
 # Colors
@@ -18,13 +18,13 @@ else
     echo -e "${RED}❌ world26 build failed${NC}"
 fi
 
-# Test 2: TypeScript check mistralapicaller
-echo -e "\n${YELLOW}Test 2: Checking mistralapicaller TypeScript...${NC}"
+# Test 2: TypeScript check nexus-backend
+echo -e "\n${YELLOW}Test 2: Checking nexus-backend TypeScript...${NC}"
 cd temp_mistralapicaller
 if npx tsc --noEmit > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ mistralapicaller TypeScript OK${NC}"
+    echo -e "${GREEN}✅ nexus-backend TypeScript OK${NC}"
 else
-    echo -e "${RED}❌ mistralapicaller TypeScript errors${NC}"
+    echo -e "${RED}❌ nexus-backend TypeScript errors${NC}"
 fi
 cd ..
 
@@ -46,7 +46,7 @@ fi
 
 # Test 5: Check world26 uses correct endpoint
 echo -e "\n${YELLOW}Test 5: Verifying world26 API endpoint...${NC}"
-if grep -q "mistralapicaller.yusufsamodin67.workers.dev/v1/chat/completions" .env; then
+if grep -q "nexus-backend.yusufsamodin67.workers.dev/v1/chat/completions" .env; then
     echo -e "${GREEN}✅ world26 configured with correct proxy URL in .env${NC}"
 else
     echo -e "${RED}❌ world26 proxy URL incorrect in .env${NC}"
@@ -55,7 +55,7 @@ fi
 # Test 6: Check CORS configuration
 echo -e "\n${YELLOW}Test 6: Checking CORS configuration...${NC}"
 if grep -q "cors(" temp_mistralapicaller/src/index.ts; then
-    echo -e "${GREEN}✅ CORS enabled in mistralapicaller${NC}"
+    echo -e "${GREEN}✅ CORS enabled in nexus-backend${NC}"
 else
     echo -e "${RED}❌ CORS not configured${NC}"
 fi

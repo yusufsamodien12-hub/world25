@@ -1,5 +1,5 @@
 {
-	"name": "mistralapicaller",
+	"name": "nexus-backend",
 	"description": "World26 API Proxy - Secure Mistral AI proxy with D1 state management",
 	"version": "1.0.0",
 	"type": "module",

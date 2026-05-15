@@ -9,7 +9,7 @@ A secure API proxy for World26 simulation, deployed on Cloudflare Workers with D
 ### 1. Deploy the Worker
 
 ```bash
-cd temp_mistralapicaller
+cd temp_nexus-backend
 npm install
 npx wrangler secret put MISTRAL_API_KEY
 npx wrangler d1 migrations apply world26-memory --remote
@@ -79,7 +79,7 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete setup instructions.
 ## 📦 Project Structure
 
 ```
-temp_mistralapicaller/
+temp_nexus-backend/
 ├── src/
 │   ├── index.ts          # Main worker code with Hono routes
 │   └── types.ts          # TypeScript type definitions

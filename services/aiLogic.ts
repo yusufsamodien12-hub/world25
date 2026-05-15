@@ -118,21 +118,15 @@ export async function decideNextAction(
   `;
 
   const mistralApiKey = ((import.meta as any)?.env?.VITE_MISTRAL_API_KEY
-    ?? (typeof process !== 'undefined' ? (process.env as any)?.MISTRAL_API_KEY : '')
     ?? '').toString().trim();
 
-  // Use Cloudflare Worker proxy in production, or direct API in development
+  // Use Cloudflare Worker proxy in production, or direct API if a key is available
   const proxyUrl = (import.meta as any)?.env?.VITE_PROXY_URL;
-  
-  // Prefer local API endpoint if running on our platform
-  const isLocal = window.location.hostname.includes('europe-west2.run.app') || window.location.hostname === 'localhost';
-  
-  // We need either a direct API key OR a proxy URL OR we're local (which might have a server-side key)
-  // BUT if we know we don't have a user key and mistralApiKey is empty, we should wait unless we want to try the server
-  if (!mistralApiKey && !proxyUrl && !userApiKey && !isLocal) {
+
+  if (!proxyUrl && !mistralApiKey && !userApiKey) {
     return {
       action: 'WAIT',
-      reason: "Missing Credentials. Add VITE_MISTRAL_API_KEY or deploy to production.",
+      reason: "Missing Credentials. Add VITE_MISTRAL_API_KEY or deploy with VITE_PROXY_URL.",
       reasoningSteps: ["Credential check failed", "Holding simulation queue", "Awaiting uplink token"],
       learningNote: "Operating in offline mode due to absent credentials.",
       knowledgeCategory: 'Synthesis',
@@ -146,16 +140,16 @@ export async function decideNextAction(
       'Content-Type': 'application/json',
     };
 
-    const isUsingProxy = proxyUrl || isLocal;
-    const endpoint = isLocal ? '/api/mistral/chat' : (proxyUrl || 'https://api.mistral.ai/v1/chat/completions');
+    const endpoint = proxyUrl || 'https://api.mistral.ai/v1/chat/completions';
+    const isUsingProxy = !!proxyUrl;
 
     // Only add Authorization if we're calling the API directly (not using proxy)
     if (!proxyUrl && (mistralApiKey || userApiKey)) {
       headers['Authorization'] = `Bearer ${userApiKey || mistralApiKey}`;
     }
 
-    // If using our proxy/local, pass userApiKey in a custom header
-    if (isUsingProxy && userApiKey) {
+    // If using proxy, pass userApiKey in a custom header if provided
+    if (proxyUrl && userApiKey) {
       headers['x-mistral-api-key'] = userApiKey;
     }
 

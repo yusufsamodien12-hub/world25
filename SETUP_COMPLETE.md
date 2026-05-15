@@ -10,7 +10,7 @@ Your World26 project now has a **production-ready Cloudflare Worker API proxy** 
 
 ### Worker Files
 ```
-temp_mistralapicaller/
+temp_nexus-backend/
 ├── src/index.ts                  ✨ Updated with enhanced CORS & dual format support
 ├── DEPLOYMENT.md                 📖 Complete deployment guide
 ├── INTEGRATION.md                🔗 Frontend integration examples
@@ -74,7 +74,7 @@ temp_mistralapicaller/
 ### 1. Deploy Your Worker
 
 ```bash
-cd temp_mistralapicaller
+cd temp_nexus-backend
 npm install
 npm run setup
 ```
@@ -89,21 +89,21 @@ This will:
 
 After deployment, copy the URL:
 ```
-https://mistralapicaller.yusufsamodin67.workers.dev
+https://nexus-backend.yusufsamodin67.workers.dev
 ```
 
 ### 3. Configure Frontend
 
 Update `.env.local` in project root:
 ```bash
-VITE_PROXY_URL=https://mistralapicaller.yusufsamodin67.workers.dev/v1/chat/completions
+VITE_PROXY_URL=https://nexus-backend.yusufsamodin67.workers.dev/v1/chat/completions
 ```
 
 ### 4. Test Everything
 
 ```bash
 # Test worker
-open temp_mistralapicaller/test.html
+open temp_nexus-backend/test.html
 
 # Test frontend
 npm run dev
@@ -122,14 +122,14 @@ git push origin main
 
 ## 🎯 What Each File Does
 
-### `temp_mistralapicaller/src/index.ts`
+### `temp_nexus-backend/src/index.ts`
 **The Worker Code**
 - Proxies requests to Mistral AI
 - Adds CORS headers automatically
 - Manages D1 database state
 - Handles both API formats
 
-### `temp_mistralapicaller/DEPLOYMENT.md`
+### `temp_nexus-backend/DEPLOYMENT.md`
 **Complete Setup Guide**
 - Prerequisites & installation
 - Secret management
@@ -137,14 +137,14 @@ git push origin main
 - Testing procedures
 - Troubleshooting
 
-### `temp_mistralapicaller/INTEGRATION.md`
+### `temp_nexus-backend/INTEGRATION.md`
 **Frontend Integration**
 - Code examples
 - Request formats
 - State persistence
 - Common issues
 
-### `temp_mistralapicaller/test.html`
+### `temp_nexus-backend/test.html`
 **Interactive Tester**
 - Beautiful UI
 - All endpoint tests
@@ -208,7 +208,7 @@ git push origin main
 
 ### Worker Commands
 ```bash
-cd temp_mistralapicaller
+cd temp_nexus-backend
 
 npm run setup          # Automated deployment
 npm run deploy         # Deploy to Cloudflare
@@ -232,7 +232,7 @@ npm run preview        # Preview build
 
 ### 1. Test Worker Health
 ```bash
-curl https://mistralapicaller.yusufsamodin67.workers.dev/
+curl https://nexus-backend.yusufsamodin67.workers.dev/
 ```
 
 Expected:
@@ -247,21 +247,21 @@ Expected:
 
 ### 2. Test AI Endpoint
 ```bash
-curl -X POST https://mistralapicaller.yusufsamodin67.workers.dev/v1/chat/completions \
+curl -X POST https://nexus-backend.yusufsamodin67.workers.dev/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{"model":"mistral-large-latest","messages":[{"role":"user","content":"Hello!"}]}'
 ```
 
 ### 3. Test State Save
 ```bash
-curl -X POST https://mistralapicaller.yusufsamodin67.workers.dev/state \
+curl -X POST https://nexus-backend.yusufsamodin67.workers.dev/state \
   -H "Content-Type: application/json" \
   -d '{"state":{"test":true}}'
 ```
 
 ### 4. Open Interactive Test
 ```bash
-open temp_mistralapicaller/test.html
+open temp_nexus-backend/test.html
 # Or just double-click the file
 ```
 
@@ -272,17 +272,17 @@ open temp_mistralapicaller/test.html
 | Document | Purpose |
 |----------|---------|
 | [QUICKSTART.md](QUICKSTART.md) | Fast command reference |
-| [DEPLOYMENT.md](temp_mistralapicaller/DEPLOYMENT.md) | Full deployment guide |
-| [INTEGRATION.md](temp_mistralapicaller/INTEGRATION.md) | Frontend integration |
+| [DEPLOYMENT.md](temp_nexus-backend/DEPLOYMENT.md) | Full deployment guide |
+| [INTEGRATION.md](temp_nexus-backend/INTEGRATION.md) | Frontend integration |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | System design |
 | [DEPLOYMENT_WORKFLOW.md](DEPLOYMENT_WORKFLOW.md) | Visual workflow |
-| [test.html](temp_mistralapicaller/test.html) | Interactive tester |
+| [test.html](temp_nexus-backend/test.html) | Interactive tester |
 
 ---
 
 ## 🎯 Next Steps
 
-1. **Deploy Worker**: `cd temp_mistralapicaller && npm run setup`
+1. **Deploy Worker**: `cd temp_nexus-backend && npm run setup`
 2. **Copy Worker URL** from deployment output
 3. **Update `.env.local`** with Worker URL
 4. **Test locally**: `npm run dev`
@@ -343,8 +343,8 @@ open temp_mistralapicaller/test.html
 If you need assistance:
 
 1. **Check Documentation**: Start with [QUICKSTART.md](QUICKSTART.md)
-2. **Test Worker**: Use [test.html](temp_mistralapicaller/test.html)
-3. **View Logs**: `cd temp_mistralapicaller && npm run logs`
+2. **Test Worker**: Use [test.html](temp_nexus-backend/test.html)
+3. **View Logs**: `cd temp_nexus-backend && npm run logs`
 4. **Check Cloudflare**: Visit your [Cloudflare Dashboard](https://dash.cloudflare.com)
 
 ---

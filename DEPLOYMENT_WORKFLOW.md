@@ -297,7 +297,7 @@ secret:set      (check      logs         PROXY_URL
 ## 🚀 One-Command Setup (Automated)
 
 ```bash
-cd temp_mistralapicaller && npm run setup
+cd temp_nexus-backend && npm run setup
 ```
 
 This runs the `deploy.sh` script which handles:
@@ -312,9 +312,9 @@ This runs the `deploy.sh` script which handles:
 
 | Problem | Solution Command |
 |---------|-----------------|
-| Worker not responding | `cd temp_mistralapicaller && npm run logs` |
-| API key missing | `cd temp_mistralapicaller && npm run secret:set` |
-| Database error | `cd temp_mistralapicaller && npm run migrate:remote` |
+| Worker not responding | `cd temp_nexus-backend && npm run logs` |
+| API key missing | `cd temp_nexus-backend && npm run secret:set` |
+| Database error | `cd temp_nexus-backend && npm run migrate:remote` |
 | Frontend can't connect | Check `.env.local` has `VITE_PROXY_URL` |
 | Changes not live | `git push origin main` |
 

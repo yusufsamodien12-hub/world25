@@ -12,7 +12,7 @@ Common issues and their solutions when working with the Cloudflare Worker.
 
 **Solution:**
 ```bash
-cd temp_mistralapicaller
+cd temp_nexus-backend
 npm run secret:set
 # Paste your Mistral API key when prompted
 npm run deploy
@@ -43,7 +43,7 @@ access-control-allow-methods: GET, POST, OPTIONS
 
 **If missing:** Worker code has CORS middleware by default. Redeploy:
 ```bash
-cd temp_mistralapicaller
+cd temp_nexus-backend
 npm run deploy
 ```
 
@@ -55,7 +55,7 @@ npm run deploy
 
 **Check Logs:**
 ```bash
-cd temp_mistralapicaller
+cd temp_nexus-backend
 npm run logs
 # Leave running and make a request
 ```
@@ -102,7 +102,7 @@ npx wrangler d1 list
 
 **Re-run migrations:**
 ```bash
-cd temp_mistralapicaller
+cd temp_nexus-backend
 npm run migrate:remote
 ```
 
@@ -275,7 +275,7 @@ git push
 
 2. **Update Worker secret:**
 ```bash
-cd temp_mistralapicaller
+cd temp_nexus-backend
 npm run secret:set
 # Paste correct key
 npm run deploy
@@ -342,7 +342,7 @@ curl https://YOUR_WORKER.workers.dev/
 
 1. **Install dependencies:**
 ```bash
-cd temp_mistralapicaller
+cd temp_nexus-backend
 npm install
 ```
 
@@ -370,7 +370,7 @@ npm install
 
 1. **Worker logs:**
 ```bash
-cd temp_mistralapicaller
+cd temp_nexus-backend
 npm run logs
 # Look for timing information
 ```
@@ -408,7 +408,7 @@ npx wrangler d1 list
 
 2. **Migrations applied:**
 ```bash
-cd temp_mistralapicaller
+cd temp_nexus-backend
 npm run migrate:remote
 ```
 
@@ -463,10 +463,10 @@ Run these commands and check output:
 curl https://YOUR_WORKER.workers.dev/
 
 # 2. Worker logs
-cd temp_mistralapicaller && npm run logs
+cd temp_nexus-backend && npm run logs
 
 # 3. Worker secrets
-cd temp_mistralapicaller && npm run secret:list
+cd temp_nexus-backend && npm run secret:list
 
 # 4. Database status
 npx wrangler d1 list

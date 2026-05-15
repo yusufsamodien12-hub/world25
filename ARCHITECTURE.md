@@ -29,7 +29,7 @@
 │                                                                 │
 │  ┌───────────────────────────────────────────────────────────┐ │
 │  │           Cloudflare Worker (API Proxy)                   │ │
-│  │           temp_mistralapicaller/                          │ │
+│  │           temp_nexus-backend/                          │ │
 │  │                                                           │ │
 │  │  ┌──────────────────────────────────────────────────┐   │ │
 │  │  │  Hono.js Router                                  │   │ │
@@ -146,9 +146,9 @@ Browser → Cloudflare Worker → Mistral AI
 - **Build:** Static HTML/JS/CSS bundle
 
 ### Worker Proxy (Cloudflare)
-- **Location:** `https://mistralapicaller.username.workers.dev`
+- **Location:** `https://nexus-backend.username.workers.dev`
 - **Tech:** Hono.js + TypeScript
-- **Files:** `temp_mistralapicaller/src/index.ts`
+- **Files:** `temp_nexus-backend/src/index.ts`
 - **Runtime:** V8 Isolates (JavaScript runtime)
 
 ### Database (Cloudflare D1)

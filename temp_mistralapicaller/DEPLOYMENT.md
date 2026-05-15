@@ -22,7 +22,7 @@ This Cloudflare Worker serves as a secure API proxy for your World26 application
 ## 🛠️ Step 1: Install Dependencies
 
 ```bash
-cd temp_mistralapicaller
+cd temp_nexus-backend
 npm install
 ```
 
