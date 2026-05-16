@@ -8,7 +8,7 @@ Create/update `.env.local` in your project root:
 
 ```bash
 # Production: Use your deployed Worker URL
-VITE_PROXY_URL=https://nexus-backend.yusufsamodin67.workers.dev/v1/chat/completions
+VITE_PROXY_URL=https://mistralapicaller.yusufsamodin67.workers.dev/v1/chat/completions
 
 # Development: Optional - use direct API or local worker
 # VITE_MISTRAL_API_KEY=your_dev_key_here
@@ -98,11 +98,11 @@ Visit `http://localhost:5173` and open DevTools Console
 
 ### Direct Worker Test
 ```bash
-curl https://nexus-backend.yusufsamodin67.workers.dev/
+curl https://mistralapicaller.yusufsamodin67.workers.dev/
 ```
 
 ### Interactive Test Page
-Open `temp_nexus-backend/test.html` in a browser
+Open `temp_mistralapicaller/test.html` in a browser
 
 ---
 
@@ -137,7 +137,7 @@ Open `temp_nexus-backend/test.html` in a browser
            ↓
 ┌──────────────────────┐
 │ Cloudflare Worker    │
-│ temp_nexus-backend│
+│ temp_mistralapicaller│
 │ + MISTRAL_API_KEY    │
 │ + D1 Database        │
 └──────────┬───────────┘
@@ -184,7 +184,7 @@ curl -I https://YOUR_WORKER.workers.dev/
 ### Issue: Worker returns 500 error
 **Solution**: Check Worker logs:
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npx wrangler tail
 ```
 
@@ -211,7 +211,7 @@ npx wrangler tail
 
 ## 🎯 Next Steps
 
-1. Deploy your Worker: `cd temp_nexus-backend && npx wrangler deploy`
+1. Deploy your Worker: `cd temp_mistralapicaller && npx wrangler deploy`
 2. Copy Worker URL
 3. Update `.env.local` with Worker URL
 4. Test locally: `npm run dev`

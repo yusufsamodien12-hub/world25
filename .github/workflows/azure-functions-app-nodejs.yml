@@ -31,7 +31,6 @@ env:
 
 jobs:
   build-and-deploy:
-    if: ${{ env.AZURE_FUNCTIONAPP_NAME != 'your-app-name' && (secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE != '' || secrets.AZURE_RBAC_CREDENTIALS != '') }}
     runs-on: windows-latest # For Linux, use ubuntu-latest
     environment: dev
     steps:

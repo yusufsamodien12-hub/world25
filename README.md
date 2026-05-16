@@ -4,7 +4,9 @@
 
 # 🌍 World26 - AI-Powered 3D Simulation
 
-A static GitHub Pages product with secure Cloudflare Worker AI proxy integration.
+An intelligent world-building simulation powered by Mistral AI, rendered in 3D with Three.js.1
+
+**View in AI Studio:** https://ai.studio/apps/drive/1_EaOtIuOLUaXP2xbDTVMLnFIQ3aBOmEv
 
 ---
 
@@ -13,12 +15,12 @@ A static GitHub Pages product with secure Cloudflare Worker AI proxy integration
 | Guide | Description |
 |-------|-------------|
 | **[🚀 Quick Start](QUICKSTART.md)** | Fast command reference for common tasks |
-| **[📖 Deployment Guide](temp_nexus-backend/DEPLOYMENT.md)** | Worker deployment instructions |
-| **[🔗 Integration Guide](temp_nexus-backend/INTEGRATION.md)** | Frontend integration examples |
+| **[📖 Deployment Guide](temp_mistralapicaller/DEPLOYMENT.md)** | Complete Worker setup instructions |
+| **[🔗 Integration Guide](temp_mistralapicaller/INTEGRATION.md)** | Frontend integration examples |
 | **[🏗️ Architecture](ARCHITECTURE.md)** | System design and data flow |
 | **[📊 Workflow](DEPLOYMENT_WORKFLOW.md)** | Visual deployment steps |
 | **[🔧 Troubleshooting](TROUBLESHOOTING.md)** | Common issues and solutions |
-| **[✅ Setup Complete](SETUP_COMPLETE.md)** | Summary of completed setup |
+| **[✅ Setup Complete](SETUP_COMPLETE.md)** | Summary of what was created |
 
 ---
 
@@ -30,11 +32,11 @@ A static GitHub Pages product with secure Cloudflare Worker AI proxy integration
 # 1. Install dependencies
 npm install
 
-# 2. Configure locally (optional):
-# Production proxy
-echo "VITE_PROXY_URL=https://nexus-backend.YOUR_SUBDOMAIN.workers.dev/v1/chat/completions" > .env.local
+# 2. Configure (choose one):
+# Option A: Use Worker proxy (recommended)
+echo "VITE_PROXY_URL=https://your-worker.workers.dev/v1/chat/completions" > .env.local
 
-# Development direct key (optional)
+# Option B: Direct API key (development only)
 echo "VITE_MISTRAL_API_KEY=your_key_here" > .env.local
 
 # 3. Start development server
@@ -45,43 +47,49 @@ Open http://localhost:5173 🎉
 
 ## Deploy to GitHub Pages
 
-### 🔒 Recommended: Use the Cloudflare Worker proxy
+### 🔒 Option 1: Secure Cloudflare Worker Proxy (Recommended)
+
+**Benefits:** API key stays hidden, no CORS issues, edge network performance
 
 1. **Deploy the Worker:**
    ```bash
-   cd temp_nexus-backend
+   cd temp_mistralapicaller
    npm install
-   npm run setup
+   npm run setup  # Automated setup script
+   # OR manually:
+   npm run secret:set  # Set your Mistral API key
+   npm run migrate:remote  # Set up database
+   npm run deploy  # Deploy to Cloudflare
    ```
 
-2. **Copy your Worker URL** (e.g., `https://nexus-backend.yourusername.workers.dev`)
+2. **Copy your Worker URL** (e.g., `https://mistralapicaller.yourusername.workers.dev`)
 
 3. **Configure Frontend:**
    Update `.env.local`:
    ```bash
-   VITE_PROXY_URL=https://nexus-backend.yourusername.workers.dev/v1/chat/completions
+   VITE_PROXY_URL=https://YOUR_WORKER.workers.dev/v1/chat/completions
    ```
 
 4. **Deploy to GitHub:**
    ```bash
    git add .
-   git commit -m "Prepare World26 for GitHub Pages launch"
+   git commit -m "Add Cloudflare Worker proxy"
    git push origin main
    ```
 
-📚 **Worker Documentation:**
-- [Deployment Guide](temp_nexus-backend/DEPLOYMENT.md)
-- [Integration Guide](temp_nexus-backend/INTEGRATION.md)
-- [Interactive Test](temp_nexus-backend/test.html)
+📚 **Full Worker Documentation:**
+- [Deployment Guide](temp_mistralapicaller/DEPLOYMENT.md)
+- [Integration Guide](temp_mistralapicaller/INTEGRATION.md)
+- [Interactive Test](temp_mistralapicaller/test.html)
 
 ---
 
-### Optional: Direct Mistral API Key
-- Use `VITE_MISTRAL_API_KEY` for local development only.
-- ⚠️ **Warning:** never commit your API key to source control.
+### Option 2: Direct Key (Not Recommended for Public Repos)
+- Add a repository secret named `VITE_MISTRAL_API_KEY` with your Mistral key.
+- ⚠️ **Warning:** API key will be exposed in browser network requests
 
 ---
 
 **After Setup:**
-- Push to `main` to trigger GitHub Pages deployment.
-- Your site will be served from the configured Pages URL.
+- Push to `main` to trigger [.github/workflows/deploy.yml](.github/workflows/deploy.yml); it builds and publishes to GitHub Pages.
+- Pages base is `/world26/`, so the site will be served from `https://<your-user>.github.io/world26/` once Pages is enabled for the repo.

@@ -12,7 +12,9 @@ window.addEventListener('error', (event) => {
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-  console.error('❌ Unhandled promise rejection:', event.reason);
+  const reason = event.reason;
+  const message = reason instanceof Error ? reason.message : JSON.stringify(reason) || String(reason);
+  console.error('❌ Unhandled promise rejection:', message, reason);
 });
 
 // Handle module loading failures

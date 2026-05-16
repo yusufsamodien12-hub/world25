@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => {
     const isProd = mode === 'production';
 
     return {
-      base: mode === 'production' ? './' : '/',
+      base: '/',
       build: {
         rollupOptions: {
           input: {

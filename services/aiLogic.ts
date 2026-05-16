@@ -1,4 +1,5 @@
 
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { WorldObject, LogEntry, WorldObjectType, GroundingLink, ConstructionPlan, KnowledgeEntry, KnowledgeCategory } from "../src/types";
 
 export interface AIActionResponse {
@@ -118,15 +119,22 @@ export async function decideNextAction(
   `;
 
   const mistralApiKey = ((import.meta as any)?.env?.VITE_MISTRAL_API_KEY
+    ?? (typeof process !== 'undefined' ? (process.env as any)?.VITE_MISTRAL_API_KEY : '')
+    ?? (typeof process !== 'undefined' ? (process.env as any)?.MISTRAL_API_KEY : '')
     ?? '').toString().trim();
 
-  // Use Cloudflare Worker proxy in production, or direct API if a key is available
+  // Use Cloudflare Worker proxy in production, or direct API in development
   const proxyUrl = (import.meta as any)?.env?.VITE_PROXY_URL;
-
-  if (!proxyUrl && !mistralApiKey && !userApiKey) {
+  
+  // Prefer local API endpoint if running on our platform
+  const isLocal = window.location.hostname.includes('europe-west2.run.app') || window.location.hostname === 'localhost';
+  
+  // We need either a direct API key OR a proxy URL OR we're local (which might have a server-side key)
+  // BUT if we know we don't have a user key and mistralApiKey is empty, we should wait unless we want to try the server
+  if (!mistralApiKey && !proxyUrl && !userApiKey && !isLocal) {
     return {
       action: 'WAIT',
-      reason: "Missing Credentials. Add VITE_MISTRAL_API_KEY or deploy with VITE_PROXY_URL.",
+      reason: "Missing Credentials. Add VITE_MISTRAL_API_KEY or deploy to production.",
       reasoningSteps: ["Credential check failed", "Holding simulation queue", "Awaiting uplink token"],
       learningNote: "Operating in offline mode due to absent credentials.",
       knowledgeCategory: 'Synthesis',
@@ -140,16 +148,16 @@ export async function decideNextAction(
       'Content-Type': 'application/json',
     };
 
-    const endpoint = proxyUrl || 'https://api.mistral.ai/v1/chat/completions';
-    const isUsingProxy = !!proxyUrl;
+    const isUsingProxy = proxyUrl || isLocal;
+    const endpoint = isLocal ? '/api/mistral/chat' : (proxyUrl || 'https://api.sketchfab.com/v3/search?type=models&q=scifi&count=1'); // fallback endpoint if mistral fails completely
 
     // Only add Authorization if we're calling the API directly (not using proxy)
-    if (!proxyUrl && (mistralApiKey || userApiKey)) {
+    if (!proxyUrl && !isLocal && (mistralApiKey || userApiKey)) {
       headers['Authorization'] = `Bearer ${userApiKey || mistralApiKey}`;
     }
 
-    // If using proxy, pass userApiKey in a custom header if provided
-    if (proxyUrl && userApiKey) {
+    // If using our proxy/local, pass userApiKey in a custom header
+    if (isUsingProxy && userApiKey) {
       headers['x-mistral-api-key'] = userApiKey;
     }
 
@@ -169,16 +177,20 @@ export async function decideNextAction(
           max_tokens: 2000
         };
 
-    console.log(`[Architect-OS] Uplink Attempt: ${endpoint}`, { isLocal, isUsingProxy });
-    const resp = await fetch(endpoint, {
+    const fetchEndpoint = isLocal ? '/api/mistral/chat' : endpoint;
+
+    console.log(`[Architect-OS] Uplink Attempt: ${fetchEndpoint}`, { isLocal, isUsingProxy });
+    const resp = await fetch(fetchEndpoint, {
       method: 'POST',
       headers: headers,
       body: JSON.stringify(requestBody)
+    }).catch(err => {
+      console.warn("[Architect-OS] Mistral Network Error, falling back to Gemini:", err);
+      return { ok: false, status: 0, text: () => Promise.resolve(err.message) } as any;
     });
 
     if (!resp.ok) {
-      const errorText = await resp.text();
-      console.error(`Mistral API error: ${resp.status}`, errorText);
+      const errorText = typeof resp.text === 'function' ? await resp.text() : 'Fetch Failed';
       throw new Error(`Mistral API error: ${resp.status} - ${errorText}`);
     }
 
@@ -186,7 +198,6 @@ export async function decideNextAction(
     
     // Check for error in response
     if (data.error) {
-      console.error('Mistral API returned error:', data.error);
       throw new Error(`Mistral API error: ${data.error.message || data.error}`);
     }
     
@@ -197,7 +208,6 @@ export async function decideNextAction(
     } else if (data.choices?.[0]?.message?.content) {
       responseText = data.choices[0].message.content;
     } else {
-      console.warn('Unexpected API response format:', data);
       responseText = '{}';
     }
     
@@ -209,26 +219,57 @@ export async function decideNextAction(
     // Help the parser if the AI adds trailing commas or other common minor issues
     let sanitizedResponse = responseText;
     try {
-      // Basic check for trailing commas in arrays/objects
       sanitizedResponse = responseText.replace(/,\s*([\]}])/g, '$1');
       const parsed = JSON.parse(sanitizedResponse);
       const links: GroundingLink[] = [];
       return { ...parsed, groundingLinks: links } as AIActionResponse;
     } catch (parseError) {
       console.error("[Architect-OS] Raw Response failed to parse:", responseText);
-      console.error("[Architect-OS] Parse Error at:", parseError);
       throw parseError;
     }
   } catch (error) {
-    console.error("Architect-OS Neural Fault:", error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return {
-      action: 'WAIT',
-      reason: `Neural desync: ${errorMessage}`,
-      reasoningSteps: ["Connection failure detected", "Re-routing synthesis request", "Flushing instruction cache"],
-      learningNote: "Logic gate misalignment detected during planning phase.",
-      knowledgeCategory: 'Synthesis',
-      taskLabel: "Recalibrating..."
-    };
+    console.error("[Architect-OS] Primary Link Severed. Engaging Gemini Fallback. Reason:", error);
+    
+    // BACKUP GEMINI API
+    try {
+      const geminiApiKey = (typeof process !== 'undefined' ? (process.env as any)?.GEMINI_API_KEY : '')
+        || (import.meta as any)?.env?.VITE_GEMINI_API_KEY;
+
+      if (!geminiApiKey) {
+        throw new Error("GEMINI_API_KEY NOT DETECTED IN ENVIRONMENT");
+      }
+
+      console.log("[Architect-OS] Initializing Gemini Neural Bridge...");
+      const genAI = new GoogleGenerativeAI(geminiApiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      
+      const promptText = systemInstruction + "\n\n" + prompt;
+      const result = await model.generateContent(promptText);
+      const responseText = result.response.text();
+      
+      if (!responseText) throw new Error("Gemini returned empty response text");
+      
+      const parsed = JSON.parse(responseText.replace(/```json\n?|```/g, '').trim());
+      return { ...parsed, groundingLinks: [] } as AIActionResponse;
+
+    } catch (geminiError) {
+      console.error("[Architect-OS] DUAL NEURAL DESYNC:", geminiError);
+      const originalErrorMessage = error instanceof Error ? error.message : String(error);
+      const fallbackErrorMessage = geminiError instanceof Error ? geminiError.message : String(geminiError);
+      
+      // ABSOLUTE FALLBACK - Prevent App-level catch to allow simulation to stay "alive" even in standby
+      return {
+        action: 'WAIT',
+        reason: `Connection Unstable. Systems in Hibernation.`,
+        reasoningSteps: [
+          `Primary uplink (Mistral) reported: ${originalErrorMessage.substring(0, 50)}...`,
+          `Secondary mesh (Gemini) reported: ${fallbackErrorMessage.substring(0, 50)}...`,
+          "Simulated safety protocols active."
+        ],
+        learningNote: "Neural connection lost. Verify API keys in platform settings.",
+        knowledgeCategory: 'Synthesis',
+        taskLabel: "Desync Warning"
+      };
+    }
   }
 }

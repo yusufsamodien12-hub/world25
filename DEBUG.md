@@ -1,4 +1,4 @@
-# Debug Report - world26 & nexus-backend
+# Debug Report - world26 & mistralapicaller
 
 ## ✅ Build Status
 
@@ -7,7 +7,7 @@
 - **Bundle Size**: 1,191.73 kB (337.73 kB gzipped)
 - **Warning**: Large bundle size - consider code splitting
 
-### nexus-backend
+### mistralapicaller
 - **Status**: ✅ TypeScript compilation successful
 - **Dependencies**: ✅ Installed correctly
 

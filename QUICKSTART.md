@@ -3,7 +3,7 @@
 ## 🚀 Deploy Worker (First Time)
 
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npm install
 npm run secret:set        # Paste your Mistral API key when prompted
 npm run migrate:remote    # Set up D1 database
@@ -17,7 +17,7 @@ npm run deploy           # Deploy to Cloudflare
 ## 🔄 Update Worker (After Changes)
 
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npm run deploy
 ```
 
@@ -58,13 +58,13 @@ curl https://YOUR_WORKER.workers.dev/state
 
 ### View Real-Time Logs
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npm run logs
 ```
 
 ### Run Worker Locally
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npm run dev
 # Access at http://localhost:8787
 ```
@@ -75,13 +75,13 @@ npm run dev
 
 ### Set API Key
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npm run secret:set
 ```
 
 ### List All Secrets
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npm run secret:list
 ```
 
@@ -91,25 +91,25 @@ npm run secret:list
 
 ### Run Migrations (Remote)
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npm run migrate:remote
 ```
 
 ### Run Migrations (Local)
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npm run migrate:local
 ```
 
 ### Query Database
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npx wrangler d1 execute world26-memory --remote --command="SELECT * FROM memory"
 ```
 
 ### Clear All State
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npx wrangler d1 execute world26-memory --remote --command="DELETE FROM memory"
 ```
 
@@ -148,7 +148,7 @@ git push origin main
 ### View Worker Analytics
 ```bash
 # Open in browser:
-https://dash.cloudflare.com → Workers & Pages → nexus-backend → Metrics
+https://dash.cloudflare.com → Workers & Pages → mistralapicaller → Metrics
 ```
 
 ### Check Worker Status
@@ -158,7 +158,7 @@ curl -I https://YOUR_WORKER.workers.dev/
 
 ### Monitor Database Usage
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npx wrangler d1 info world26-memory
 ```
 
@@ -168,7 +168,7 @@ npx wrangler d1 info world26-memory
 
 ### Worker Returns "Missing API Key"
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npm run secret:set
 # Paste your Mistral API key
 npm run deploy
@@ -185,14 +185,14 @@ curl -I https://YOUR_WORKER.workers.dev/
 
 ### Database Errors
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npm run migrate:remote
 npm run deploy
 ```
 
 ### Worker Not Updating
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npx wrangler deploy --compatibility-date=$(date +%Y-%m-%d)
 ```
 
@@ -275,7 +275,7 @@ MISTRAL_API_KEY=your_mistral_api_key
 
 ### Update API Key
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npm run secret:set
 npm run deploy
 ```
@@ -288,20 +288,20 @@ curl https://YOUR_WORKER.workers.dev/
 
 ### View Last 100 Logs
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npx wrangler tail --format=pretty
 ```
 
 ### Backup Database State
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npx wrangler d1 execute world26-memory --remote \
   --command="SELECT * FROM memory" > backup.json
 ```
 
 ### Restore Database State
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npx wrangler d1 execute world26-memory --remote \
   --file=restore.sql
 ```
@@ -312,20 +312,20 @@ npx wrangler d1 execute world26-memory --remote \
 
 ### Rollback Worker Deployment
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npx wrangler rollback
 ```
 
 ### Delete All Worker Secrets
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npx wrangler secret delete MISTRAL_API_KEY
 ```
 
 ### Delete Worker Completely
 ```bash
-cd temp_nexus-backend
-npx wrangler delete nexus-backend
+cd temp_mistralapicaller
+npx wrangler delete mistralapicaller
 ```
 
 ---
@@ -342,10 +342,10 @@ npx wrangler delete nexus-backend
 
 ## 📞 Need Help?
 
-- 📚 [Full Deployment Guide](temp_nexus-backend/DEPLOYMENT.md)
-- 🔗 [Integration Guide](temp_nexus-backend/INTEGRATION.md)
+- 📚 [Full Deployment Guide](temp_mistralapicaller/DEPLOYMENT.md)
+- 🔗 [Integration Guide](temp_mistralapicaller/INTEGRATION.md)
 - 🏗️ [Architecture Overview](ARCHITECTURE.md)
-- 🧪 [Interactive Test Page](temp_nexus-backend/test.html)
+- 🧪 [Interactive Test Page](temp_mistralapicaller/test.html)
 
 ---
 

@@ -13,10 +13,11 @@ const getStateEndpoint = () => {
   const proxyUrl = (import.meta as any).env?.VITE_PROXY_URL;
   
   if (proxyUrl && proxyUrl.includes('workers.dev')) {
+    // Old proxy with state support
     const baseUrl = proxyUrl.split('/v1/')[0];
     return `${baseUrl}/state`;
   }
-  return null;
+  return '/api/state';
 };
 
 const API_BASE = getStateEndpoint();

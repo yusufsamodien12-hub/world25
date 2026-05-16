@@ -9,7 +9,7 @@ A secure API proxy for World26 simulation, deployed on Cloudflare Workers with D
 ### 1. Deploy the Worker
 
 ```bash
-cd temp_nexus-backend
+cd temp_mistralapicaller
 npm install
 npx wrangler secret put MISTRAL_API_KEY
 npx wrangler d1 migrations apply world26-memory --remote
@@ -18,20 +18,20 @@ npx wrangler deploy
 
 ### 2. Get Your Worker URL
 
-After deployment, copy the URL (e.g., `https://nexus-backend.yourusername.workers.dev`)
+After deployment, copy the URL (e.g., `https://mistralapicaller.yourusername.workers.dev`)
 
 ### 3. Configure Frontend
 
 Update your `.env.local` file:
 ```bash
-VITE_PROXY_URL=https://nexus-backend.yourusername.workers.dev/v1/chat/completions
+VITE_PROXY_URL=https://mistralapicaller.yourusername.workers.dev/v1/chat/completions
 ```
 
 ### 4. Test It
 
 Open `test.html` in your browser or visit:
 ```
-https://nexus-backend.yourusername.workers.dev/
+https://mistralapicaller.yourusername.workers.dev/
 ```
 
 ## 📚 Full Documentation
@@ -79,7 +79,7 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete setup instructions.
 ## 📦 Project Structure
 
 ```
-temp_nexus-backend/
+temp_mistralapicaller/
 ├── src/
 │   ├── index.ts          # Main worker code with Hono routes
 │   └── types.ts          # TypeScript type definitions

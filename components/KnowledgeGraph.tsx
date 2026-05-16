@@ -25,7 +25,13 @@ const CATEGORY_COLORS: Record<KnowledgeCategory, string> = {
   Synthesis: '#f472b6'
 };
 
-export const KnowledgeGraph: React.FC<{ entries: KnowledgeEntry[], width?: number, height?: number }> = ({ entries, width = 350, height = 250 }) => {
+export const KnowledgeGraph: React.FC<{ 
+  entries: KnowledgeEntry[], 
+  width?: number, 
+  height?: number, 
+  searchTerm?: string,
+  onNodeClick?: (id: string) => void
+}> = ({ entries, width = 350, height = 250, searchTerm = "", onNodeClick }) => {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [filterCategory, setFilterCategory] = useState<KnowledgeCategory | 'All'>('All');
@@ -175,17 +181,27 @@ export const KnowledgeGraph: React.FC<{ entries: KnowledgeEntry[], width?: numbe
         })}
         {nodes.map((n, i) => {
           const color = CATEGORY_COLORS[n.category] || '#ffffff';
+          const isMatch = searchTerm !== "" && n.title.toLowerCase().includes(searchTerm.toLowerCase());
+          
           return (
           <g key={n.id} filter="url(#nodeGlow)">
-            {/* Pulse effect for only the latest node */}
-            {i === nodes.length - 1 && (
-              <circle cx={n.x} cy={n.y} r={12} fill={color} opacity="0.2">
-                <animate attributeName="r" values="8;16;8" dur="2s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.4;0;0.4" dur="2s" repeatCount="indefinite" />
+            {/* Pulse effect for only the latest node OR matching nodes */}
+            {(i === nodes.length - 1 || isMatch) && (
+              <circle cx={n.x} cy={n.y} r={isMatch ? 15 : 12} fill={color} opacity="0.2">
+                <animate attributeName="r" values={isMatch ? "10;18;10" : "8;16;8"} dur={isMatch ? "1.5s" : "2s"} repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.4;0;0.4" dur={isMatch ? "1.5s" : "2s"} repeatCount="indefinite" />
               </circle>
             )}
-            <circle cx={n.x} cy={n.y} r={4.5} fill={color} className="transition-all duration-500 hover:r-6 cursor-pointer" />
-            <circle cx={n.x} cy={n.y} r={8} fill="transparent" stroke={color} strokeWidth="0.5" strokeDasharray="2 2" className="animate-[spin_4s_linear_infinite]" />
+            <circle 
+              cx={n.x} cy={n.y} 
+              r={isMatch ? 7 : 4.5} 
+              fill={isMatch ? "#fff" : color} 
+              className="transition-all duration-500 hover:r-6 cursor-pointer" 
+              stroke={isMatch ? color : "none"}
+              strokeWidth={isMatch ? 2 : 0}
+              onClick={() => onNodeClick?.(n.id)}
+            />
+            <circle cx={n.x} cy={n.y} r={isMatch ? 10 : 8} fill="transparent" stroke={color} strokeWidth={isMatch ? 1 : 0.5} strokeDasharray="2 2" className="animate-[spin_4s_linear_infinite]" />
             <title>{n.title} [{n.category}]</title>
           </g>
           );
